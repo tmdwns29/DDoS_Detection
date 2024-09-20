@@ -52,7 +52,7 @@ def home():
     text = None
     if request.method == 'POST':
         captcha_response = request.form['g-recaptcha-response']
-        secret_key = '6LdtPjgqAAAAAPLNFUfhrhxMYcSzIrQUkleG0VrL'
+        secret_key = '6LdUUkkqAAAAAA6vCu__hLaamUUoQMluJc4qy9y0'
         verify_url = 'https://www.google.com/recaptcha/api/siteverify'
         data = {'secret': secret_key, 'response': captcha_response}
         response = requests.post(verify_url, data=data)
