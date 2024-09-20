@@ -109,4 +109,4 @@ def main():
     return render_template('index.html')  # 인증 후에만 접근 가능한 페이지
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run('0.0.0.0', debug=True)
