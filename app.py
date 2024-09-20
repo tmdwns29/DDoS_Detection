@@ -114,7 +114,7 @@ def capture_packets(interface='eth0'):
             pass
 
 # Flask 앱 실행 시 백그라운드에서 패킷 캡처 실행
-@app.before_first_request
+@app.before_request
 def activate_packet_capture():
     capture_thread = threading.Thread(target=capture_packets)
     capture_thread.daemon = True  # Flask 종료 시 스레드 종료
