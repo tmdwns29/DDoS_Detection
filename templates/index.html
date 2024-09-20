@@ -10,13 +10,7 @@
 
   <!-- Flask에서 받은 flash 메시지를 alert으로 표시 -->
   <script>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          alert("{{ message }}");  <!-- flash 메시지를 alert으로 표시 -->
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+    alert('DDOS detected!!!!!');
   </script>
 
   {% if text %}
