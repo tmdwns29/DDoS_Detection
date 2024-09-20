@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Test</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+</head>
+<body style="padding: 100px">
+  <h1>Test Web Server</h1>
+  <p>1. 메시지 입력 후 체크박스 체크</p>
+  <p>2. 제출 버튼 클릭(성공 시 입력한 메시지 출력, 실패 시 에러메시지 출력)</p>
+  <p>3. 캡차 초기화</p>
+  <form method="POST" action="/" style="width: 300px;">
+    <input type="text" name="user_input" required>
+    <button type="submit">Submit</button>
+	<div class="g-recaptcha" data-sitekey="6LdtPjgqAAAAACq-ijSIRgd7OaU5oKcd4Roedwgp"></div>
+	<br/>
+	<!--input type="submit" value="Submit"-->
+  </form>
+  {% if text %}
+    <h2>You entered: {{ text }}</h2>
+  {% endif %}
+</body>
+</html>
