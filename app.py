@@ -90,7 +90,7 @@ def index():
 def recaptcha():
     if request.method == 'POST':
         captcha_response = request.form['g-recaptcha-response']
-        secret_key = 'YOUR_SECRET_KEY'  # Google reCAPTCHA 시크릿 키
+        secret_key = '6LdtPjgqAAAAAPLNFUfhrhxMYcSzIrQUkleG0VrL'  # Google reCAPTCHA 시크릿 키
         verify_url = 'https://www.google.com/recaptcha/api/siteverify'
         data = {'secret': secret_key, 'response': captcha_response}
         response = requests.post(verify_url, data=data)
