@@ -2,24 +2,15 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Test</title>
+  <title>reCAPTCHA 인증</title>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
 </head>
-<body style="padding: 100px">
-  <h1>Test Web Server</h1>
-  <p>1. 메시지 입력 후 체크박스 체크</p>
-  <p>2. 제출 버튼 클릭(성공 시 입력한 메시지 출력, 실패 시 에러메시지 출력)</p>
-  <p>3. 캡차 초기화</p>
-  <form method="POST" action="/" style="width: 300px;">
-    <input type="text" name="user_input" required>
-    <button type="submit">Submit</button>
-	<div class="g-recaptcha" data-sitekey="6LdtPjgqAAAAACq-ijSIRgd7OaU5oKcd4Roedwgp"></div>
-	<br/>
-	<!--input type="submit" value="Submit"-->
+<body>
+  <h1>접속을 위해 reCAPTCHA 인증을 완료하세요</h1>
+  <form method="POST">
+    <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY"></div>
+    <br/>
+    <button type="submit">인증</button>
   </form>
-  {% if text %}
-    <h2>You entered: {{ text }}</h2>
-  {% endif %}
 </body>
 </html>
