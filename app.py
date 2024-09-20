@@ -102,6 +102,7 @@ def recaptcha():
             session['authenticated'] = True  # reCAPTCHA 인증 완료를 세션에 저장
             return redirect(url_for('main'))  # 인증 성공 시 메인 페이지로 리디렉션
         else:
+            session['authenticated'] = False
             return render_template('failed.html')  # 인증 실패 시 에러 페이지 표시
 
     return render_template('recaptcha.html')  # GET 요청 시 reCAPTCHA 페이지 렌더링
@@ -112,6 +113,12 @@ def main():
     if not session.get('authenticated'):  # 세션에 인증 정보가 없으면 reCAPTCHA 페이지로 리디렉션
         return redirect(url_for('recaptcha'))
     return render_template('index.html')  # 인증 후에만 접근 가능한 페이지
+
+# 로그아웃 (선택 사항)
+@app.route('/logout')
+def logout():
+    session.pop('authenticated', None)  # 세션에서 인증 정보를 제거
+    return redirect(url_for('recaptcha'))  # 로그아웃 후 reCAPTCHA 페이지로 리디렉션
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
