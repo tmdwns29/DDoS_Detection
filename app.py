@@ -104,9 +104,10 @@ def recaptcha():
     return render_template('recaptcha.html')  # GET 요청 시 reCAPTCHA 페이지 렌더링
 
 # 메인 페이지
-@app.route('/main')
-def main():
-    return render_template('index.html')  # 인증 후에만 접근 가능한 페이지
+# @app.route('/main')
+# def main():
+#     if 
+#     return render_template('index.html')  # 인증 후에만 접근 가능한 페이지
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
