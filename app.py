@@ -80,6 +80,8 @@ import requests
 
 app = Flask(__name__)
 
+app.secret_key = 's3cR3tK3y!@#12345678_abcdef'
+
 # 기본 페이지: reCAPTCHA 인증 페이지로 리디렉션
 @app.route('/')
 def index():
