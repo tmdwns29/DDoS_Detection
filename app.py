@@ -87,42 +87,6 @@ app = Flask(__name__)
 
 app.secret_key = 's3cR3tK3y!@#12345678_abcdef'
 
-# 비정상적인 트래픽을 감지하기 위한 딕셔너리 (IP 주소별 요청 수)
-traffic_data = {}
-
-# DOS 감지 임계값 (예시: 같은 IP에서 10초 이내에 100개 이상의 패킷이 오면 DOS로 판단)
-DOS_THRESHOLD = 100
-TIME_FRAME = 10  # 시간 간격 (초)
-
-# 패킷 캡처 함수
-def capture_packets(interface='eth0'):
-    global traffic_data
-    capture = pyshark.LiveCapture(interface=interface)
-    
-    for packet in capture.sniff_continuously():
-        try:
-            src_ip = packet.ip.src
-            if src_ip in traffic_data:
-                traffic_data[src_ip]['count'] += 1
-            else:
-                traffic_data[src_ip] = {'count': 1, 'timestamp': packet.sniff_time}
-            
-            # 동일 IP에서 일정 시간 내에 비정상적인 트래픽이 발생하면 경고
-            if traffic_data[src_ip]['count'] > DOS_THRESHOLD:
-                flash(f"[ALERT] DOS 공격 감지: {src_ip}에서 비정상적인 트래픽 발생")  # 경고 메시지 전달
-                traffic_data[src_ip]['count'] = 0  # 감지 후 카운트 리셋
-                
-        except AttributeError:
-            # 패킷에 IP 정보가 없으면 무시 (예: ARP 패킷)
-            pass
-
-# Flask 앱 실행 시 백그라운드에서 패킷 캡처 실행
-@app.before_request
-def activate_packet_capture():
-    capture_thread = threading.Thread(target=capture_packets)
-    capture_thread.daemon = True  # Flask 종료 시 스레드 종료
-    capture_thread.start()
-
 # 기본 페이지: reCAPTCHA 인증 페이지로 리디렉션
 @app.route('/')
 def index():
