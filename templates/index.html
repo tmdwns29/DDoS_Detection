@@ -12,6 +12,13 @@
     <main class="container">
       <h1>Home Page</h1>
         <h4>캡차 인증에 성공했습니다.</h4>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <script>
+                alert("{{ messages[0] }}");  // 첫 번째 flash 메시지를 alert로 표시
+            </script>
+          {% endif %}
+        {% endwith %}
         <form action="/" method="get">
             <button>Retry</button>
         </form>
