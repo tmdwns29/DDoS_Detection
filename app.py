@@ -108,7 +108,7 @@ def recaptcha():
             return redirect(url_for('main'))  # 인증 성공 시 메인 페이지로 리디렉션
         else:
             session['authenticated'] = False
-            return render_template('failed.html')  # 인증 실패 시 에러 페이지 표시
+            return "<script>alert('캡차 인증 실패'); history.back();</script>"
 
     return render_template('recaptcha.html')  # GET 요청 시 reCAPTCHA 페이지 렌더링
 
