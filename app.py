@@ -137,6 +137,8 @@ import requests
 import sys
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from scapy.all import wrpcap, Ether
+from scapy.config import conf
+conf.prog.tshark = "C:\\Program Files\\Wireshark\\tshark.exe"
 
 app = Flask(__name__)
 
