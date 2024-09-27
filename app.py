@@ -379,8 +379,7 @@ def monitor_packets():
             for packet in capture.sniff_continuously():
                 packet_count += 1
                 elapsed_time = time.time() - unix_start_time
-                # print(f"경과 시간: {elapsed_time:.4f} sec, 총 패킷 수: {packet_count}")
-                print(f"{measure_rps('http://192.168.20.15:5050', 100)} RPS")
+                print(f"경과 시간: {elapsed_time:.4f} sec, 총 패킷 수: {packet_count}")
                 sys.stdout.flush()
 
                 if elapsed_time >= 60:
