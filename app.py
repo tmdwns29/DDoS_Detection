@@ -385,11 +385,15 @@ def monitor_packets():
                 if elapsed_time >= 60:
                     avg_packets_per_second = packet_count / elapsed_time
 
-                    if packet_count >= total_threshold or avg_packets_per_second >= average_threshold:
-                        attack_detected = True
-                        last_attack_time = time.time()  # 마지막 공격 시간 기록
-                        print(f"DDoS 공격 감지! 총 패킷 수: {packet_count}, 초당 평균 패킷 수: {avg_packets_per_second}")
-                        sys.stdout.flush()
+                    if packet_count >= total_threshold:
+                        # TODO : 1차 필터 3분 총 패킷 감지 경고
+                        if avg_packets_per_second >= average_threshold:
+                            # 2차 필터 -> 5분 초당 평균 패킷 감지 경고
+                            # 3차 필터 -> 7분 초당 평균 패킷 감지 경고
+                            attack_detected = True
+                            last_attack_time = time.time()  # 마지막 공격 시간 기록
+                            print(f"DDoS 공격 감지! 총 패킷 수: {packet_count}, 초당 평균 패킷 수: {avg_packets_per_second}")
+                            sys.stdout.flush()
 
                         break
                     else:
@@ -425,6 +429,40 @@ def SMS_notification(contents):
         to='+821041272507'
     )
     print(message.sid)
+
+
+def measure_rps(url, duration=10):
+    """
+    주어진 URL로 초당 요청 수(RPS)를 측정하는 함수.
+    
+    Parameters:
+    url (str): 요청할 URL
+    duration (int): 테스트 지속 시간 (초)
+    
+    Returns:
+    float: 측정된 초당 요청 수 (RPS)
+    """
+    start_time = time.time()
+    request_count = 0
+    
+    while True:
+        current_time = time.time()
+        if current_time - start_time > duration:
+            break
+        
+        # HTTP 요청 보내기
+        response = requests.get(url)
+        
+        # 요청 성공 시 카운트 증가
+        if response.status_code == 200:
+            request_count += 1
+    
+    # 총 걸린 시간 계산
+    elapsed_time = time.time() - start_time
+    
+    # RPS 계산
+    rps = request_count / elapsed_time
+    return rps
 
 # Flask와 wxPython을 각각 다른 스레드에서 실행
 if __name__ == '__main__':
