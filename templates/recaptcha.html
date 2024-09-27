@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>reCAPTCHA인증</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+</head>
+<body style="padding: 100px">
+  <h1>reCAPTCHA인증</h1>
+  {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <script>
+                alert("{{ messages[0] }}");  // 첫 번째 flash 메시지를 alert로 표시
+            </script>
+        {% endif %}
+    {% endwith %}
+  <form method="POST" action="/recaptcha" style="width: 300px;">
+    <button type="submit">Submit</button>
+	<div class="g-recaptcha" data-sitekey="6LdtPjgqAAAAACq-ijSIRgd7OaU5oKcd4Roedwgp"></div>
+
+</body>
+</html>
