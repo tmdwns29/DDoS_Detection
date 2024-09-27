@@ -394,7 +394,6 @@ def monitor_packets():
                             last_attack_time = time.time()  # 마지막 공격 시간 기록
                             print(f"DDoS 공격 감지! 총 패킷 수: {packet_count}, 초당 평균 패킷 수: {avg_packets_per_second}")
                             sys.stdout.flush()
-
                         break
                     else:
                         last_attack_time = time.time()  # 마지막 공격 시간 기록
