@@ -1,32 +1,19 @@
-from twilio.rest import Client
+from pushbullet import PushBullet
 
-class SMSNotification:
-    def __init__(self):
-        self.account_sid = 'ACfbeef8c50838c40766d24479947a106a'
-        self.auth_token = 'dff00c52e9c4469055219720b0f788ad'
-        self.client = Client(self.account_sid, self.auth_token)
+def send_msg():
+    API_KEY = "o.j7rSYqAr9ldk6zqJwofUe1azpC07E3la"
+    file = "C:\\Users\\12000\\captcha_website\\DDoS_Detection\\resolution.txt"
 
-    def send_sms(self, contents, to_number='+821041272507'):
-        message = self.client.messages.create(
-            from_='+19045744303',
-            body=contents,
-            to=to_number
-        )
-        print(message.sid)
+    # 텍스트 파일 읽기
+    with open(file, mode='r', encoding='utf-8') as f:
+        text = f.read()
 
-# from twilio.rest import Client
+    # PushBullet API 사용
+    pb = PushBullet(API_KEY)
 
-# account_sid = 'ACfbeef8c50838c40766d24479947a106a'
-# auth_token = 'dff00c52e9c4469055219720b0f788ad'
-# client = Client(account_sid, auth_token)
+    # 등록된 디바이스 확인
+    devices = pb.devices
 
-# message = client.messages.create(
-#   from_='+19045744303',
-#   body='''
-# [경고]DDoS 공격 감지
-# 서버 확인 요망
-# ''',
-#   to='+821041272507'
-# )
-
-# print(message.sid)
+    # 푸시 알림 전송
+    # push = pb.push_file(device=devices[0], file_url='C:\\Users\\12000\\Downloads\\pushbullet\\team-386673_1280.jpg', file_name='트래픽 그래프', file_type='image')
+    push = pb.push_note("트래픽 이상 감지 시스템", text)
