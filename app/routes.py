@@ -15,14 +15,11 @@ def index():
 @main_routes.route('/recaptcha', methods=['GET', 'POST'])
 def recaptcha():
     # reCAPTCHA 인증 처리
-    if packet_monitor.attack_detected:
-        flash('DDoS 공격이 감지되었습니다! 즉시 조치가 필요합니다.', 'danger')
 
     # 공격이 60초 이상 발생하지 않으면 공격 중지로 판단
     if packet_monitor.last_attack_time and time.time() - packet_monitor.last_attack_time > 60:
         with packet_monitor.lock:
             packet_monitor.attack_detected = False
-            packet_monitor.SMS_bool = False
 
     if request.method == 'POST':
         captcha_response = request.form['g-recaptcha-response']
@@ -32,8 +29,11 @@ def recaptcha():
         else:
             session['authenticated'] = False
             return "<script>alert('캡차 인증 실패'); history.back();</script>"
-
+    if packet_monitor.attack_detected:
+        with packet_monitor.lock:
+            flash('DDoS 공격이 감지되었습니다! 즉시 조치가 필요합니다.', 'danger')
     return render_template('recaptcha.html')
+
 
 @main_routes.route('/main')
 def main_page():
