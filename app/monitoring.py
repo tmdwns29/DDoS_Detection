@@ -41,6 +41,8 @@ class PacketMonitor:
             unix_start_time = time.time()
             warnings_triggered = [False, False]
 
+            print(f"모니터링 시작 시간: {datetime.fromtimestamp(unix_start_time).strftime('%Y-%m-%d %H:%M:%S')}")
+            
             while True:
                 line = process.stdout.readline()
                 if line.strip():
@@ -62,12 +64,12 @@ class PacketMonitor:
                     if 59 <= elapsed_time % 60 < 61 and data_length >= 10000 and icmp_type and self.packet_count > 15:
                         with self.lock:
                             self.attack_detected = True
-                            self._trigger_attack(avg_packets_per_second, attack_type)
+                            self._trigger_attack(avg_packets_per_second, attack_type, ping_dl=data_length)
                             unix_start_time = time.time()
                             warnings_triggered = [False, False]
                             self.packet_count = 0
 
-                    if 171 <= elapsed_time < 180 and self.packet_count >= self.total_threshold and not warnings_triggered[0]:
+                    if 179 <= elapsed_time < 181 and self.packet_count >= self.total_threshold and not warnings_triggered[0]:
                         with self.lock:
                             self._trigger_warning(3, 1, self.packet_count, avg_packets_per_second, attack_type)
                             warnings_triggered[0] = True
@@ -94,13 +96,14 @@ class PacketMonitor:
 
     def _trigger_warning(self, m, warning_level, packet_count, avg_packets_per_second, atck_type):
         """트래픽 상태에 따른 경고 처리"""
-        message = f"{warning_level}차 경고:\n{m}분동안 총 패킷 {packet_count}개 수신\n{avg_packets_per_second:.2f}pps\n공격유형: {atck_type}"
+        message = f"{warning_level}차 경고:\n{m}분동안 총 패킷 {packet_count}개 수신\n{avg_packets_per_second:.2f}pps\n공격유형: {atck_type}\n{datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')}"
         print(message)
         self.show_notification(False, '서버 트래픽 상태 알림', message)
 
-    def _trigger_attack(self, avg_packets_per_second, atck_type):
+    def _trigger_attack(self, avg_packets_per_second, atck_type, ping_dl=None):
         """공격 감지 처리"""
-        message = f"DDoS 공격 감지!\n{avg_packets_per_second:.2f}pps\n공격유형: {atck_type}"
+        message = f"DDoS 공격 감지!\n{avg_packets_per_second:.2f}pps\n공격유형: {atck_type}\n{datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')}"
+        if ping_dl: message += f"\n데이터 크기 :{ping_dl}byte"
         print(message)
         send_msg(message)
         self.show_notification(True, '서버 트래픽 상태 알림', message)
@@ -116,7 +119,7 @@ class PacketMonitor:
             message=message,
             app_name="트래픽 모니터링",
             app_icon=f'assets/{icon}',
-            # timeout=5  # 초
+            timeout=15  # 초
         )
 
     def start_monitoring(self):
