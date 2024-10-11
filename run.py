@@ -1,9 +1,13 @@
 from flask import Flask
 from app.routes import main_routes  # Flask 라우트 임포트
 from app.monitoring import packet_monitor  # PacketMonitor 임포트
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 's3cR3tK3y!@#12345678_abcdef'
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
 app.register_blueprint(main_routes)
 
 if __name__ == '__main__':

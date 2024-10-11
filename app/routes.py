@@ -31,7 +31,7 @@ def recaptcha():
             return "<script>alert('캡차 인증 실패'); history.back();</script>"
     if packet_monitor.attack_detected:
         with packet_monitor.lock:
-            flash('DDoS 공격이 감지되었습니다! 즉시 조치가 필요합니다.', 'danger')
+            flash('DDoS 공격이 감지되었습니다! 잠시 대기해주시기 바랍니다.', 'danger')
     return render_template('recaptcha.html')
 
 
@@ -42,7 +42,7 @@ def main_page():
         return redirect(url_for('main.recaptcha'))
 
     if packet_monitor.is_attack_detected():
-        flash('DDoS 공격이 감지되었습니다! 즉시 조치가 필요합니다.', 'danger')
+        flash('DDoS 공격이 감지되었습니다! 잠시 대기해주시기 바랍니다.', 'danger')
         return redirect(url_for('main.recaptcha'))
 
     return render_template('index.html')
