@@ -1,35 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <meta charset="utf-8" http-equiv="refresh" content="60">
-  <title>reCAPTCHA인증</title>
+  <meta charset="utf-8" http-equiv="refresh">
+  <title>reCAPTCHA 인증</title>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <style>
+    /* 전체 페이지를 flexbox로 설정 */
+    body {
+      display: flex;
+      justify-content: center; /* 수평 가운데 정렬 */
+      align-items: center; /* 수직 가운데 정렬 */
+      height: 100vh; /* 전체 화면 높이 */
+      margin: 0; /* 기본 마진 제거 */
+      padding: 0; /* 기본 패딩 제거 */
+      background-color: #efefef;
+    }
+    /* 내부 콘텐츠 스타일 */
+    .content {
+      padding: 50px;
+      text-align: center; /* 텍스트 가운데 정렬 */
+      width: 100%; /* 콘텐츠 너비 100% */
+      max-width: 500px; /* 최대 너비 설정 */
+      max-height: 400px;
+      background-color: white;
+      box-shadow: 0 0px 15px gray; /* 그림자 효과 */
+    }
+    /* 폼 스타일 */
+    form {
+      display: flex;
+      flex-direction: column; /* 수직 방향으로 배치 */
+      align-items: center; /* 아이템 수평 가운데 정렬 */
+      margin-top: 20px; /* 위쪽 여백 추가 */
+    }
+    /* 버튼 스타일 */
+    button {
+      margin-top: 10px; /* 버튼과 reCAPTCHA 사이의 여백 */
+      padding: 10px 20px; /* 버튼 패딩 설정 */
+      width: 303px;
+      height: 50px;
+    }
+    h1 {
+      color: midnightblue;
+    }
+  </style>
 </head>
-<body style="padding: 100px">
-  <h1>reCAPTCHA인증</h1>
-  {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <script>
-              function checkConditionAndReload() {
-              // 서버에서 조건 확인
-                fetch('/check-condition')
-                  .then(response => response.json())
-                  .then(data => {
-                      // 서버에서 조건이 만족되면 페이지 새로고침
-                      if (data.reload) {
-                        window.location.reload();
-                      }
-                  });
-              }
-              setInterval(checkConditionAndReload, 5000);
-              alert("{{ messages[0] }}");  // 첫 번째 flash 메시지를 alert로 표시
-            </script>
-        {% endif %}
-    {% endwith %}
-  <form method="POST" action="/recaptcha" style="width: 300px;">
-    <button type="submit">Submit</button>
-	<div class="g-recaptcha" data-sitekey="6LdtPjgqAAAAACq-ijSIRgd7OaU5oKcd4Roedwgp"></div>
+<body>
+  <div class="content">
+    <h1>reCAPTCHA 인증</h1>
 
+    {% if alert_message %}
+      <script>alert("{{ alert_message }}");</script>
+    {% endif %}
+    
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <script>
+          function checkConditionAndReload() {
+          // 서버에서 조건 확인
+            fetch('/check-condition')
+              .then(response => response.json())
+              .then(data => {
+                  // 서버에서 조건이 만족되면 페이지 새로고침
+                  if (data.reload) {
+                    window.location.reload();
+                  }
+              });
+          }
+          setInterval(checkConditionAndReload, 5000);
+        </script>
+      {% endif %}
+    {% endwith %}
+    <form method="POST" action="/recaptcha">
+      <div class="g-recaptcha" data-sitekey="6LdtPjgqAAAAACq-ijSIRgd7OaU5oKcd4Roedwgp"></div>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
 </body>
 </html>

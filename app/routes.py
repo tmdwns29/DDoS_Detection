@@ -10,16 +10,13 @@ main_routes = Blueprint('main', __name__)
 @main_routes.route('/')
 def index():
     # 기본 페이지: reCAPTCHA 인증 페이지로 리디렉션
+    session.clear()
     return redirect(url_for('main.recaptcha'))
 
 @main_routes.route('/recaptcha', methods=['GET', 'POST'])
 def recaptcha():
     # reCAPTCHA 인증 처리
-
-    # 공격이 60초 이상 발생하지 않으면 공격 중지로 판단
-    if packet_monitor.last_attack_time and time.time() - packet_monitor.last_attack_time > 60:
-        with packet_monitor.lock:
-            packet_monitor.attack_detected = False
+    message = None
 
     if request.method == 'POST':
         captcha_response = request.form['g-recaptcha-response']
@@ -28,15 +25,17 @@ def recaptcha():
             return redirect(url_for('main.main_page'))
         else:
             session['authenticated'] = False
-            return "<script>alert('캡차 인증 실패'); history.back();</script>"
+            message = '캡차 인증 실패! 다시 시도해주세요.'
     if packet_monitor.attack_detected:
         with packet_monitor.lock:
-            flash('DDoS 공격이 감지되었습니다! 잠시 대기해주시기 바랍니다.', 'danger')
-    return render_template('recaptcha.html')
+            message = 'DDoS공격이 감지되었습니다. 잠시 대기해주시기 바랍니다.'
+            
+    return render_template('recaptcha.html', alert_message=message)
 
 
 @main_routes.route('/main')
 def main_page():
+
     # 메인 페이지: 인증된 사용자만 접근 가능
     if not session.get('authenticated'):
         return redirect(url_for('main.recaptcha'))

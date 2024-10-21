@@ -1,27 +1,102 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>메인 페이지</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet"> <!-- Google Fonts -->
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* 수직 중앙 정렬 */
+            align-items: flex-start; /* 왼쪽 정렬 */
+            height: 100vh;
+            color: white; /* 텍스트 색상 */
+            font-family: 'Roboto', sans-serif; /* Roboto 폰트 적용 */
+            text-align: left; /* 텍스트 왼쪽 정렬 */
+            margin: 0; /* 기본 마진 제거 */
+            background-image: url("/static/assets/home.jpg"); /* 배경 이미지 경로 설정 */
+            background-size: cover; /* 배경 이미지 크기 조정 */
+            background-position: top; /* 배경 이미지 위치 조정 */
+            background-repeat: no-repeat; /* 배경 이미지 반복 방지 */
+            opacity: 0; /* 초기 투명도 설정 */
+            transition: opacity 2s ease; /* 서서히 나타나는 효과 */
+            padding-left: 20px; /* 왼쪽 패딩 추가 */
+        }
+        .home-link {
+            font-size: 1.5em; /* 폰트 크기 */
+            color: white; /* 텍스트 색상 */
+            text-decoration: none; /* 밑줄 제거 */
+        }
+        .message-container {
+            display: flex; /* 플렉스 박스 사용 */
+            flex-direction: column; /* 수직 방향으로 배치 */
+            align-items: center; /* 왼쪽 정렬 */
+            margin-left: 100px; /* 왼쪽 여백 추가 */
+        }
+        h1 {
+            font-size: 5em; /* 큰 제목 */
+            margin: 0; /* 여백 제거 */
+            font-family: 'Noto Sans', sans-serif; /* Noto Sans 폰트 적용 */
+            text-shadow: 0px 0px 50px white; /* 텍스트 그림자 효과 */
+        }
+        .retry-btn {
+            margin-top: 20px; /* 버튼 위쪽 여백 추가 */
+            padding: 10px 20px;
+            font-size: 1.5em;
+            color: white; /* 버튼 텍스트 색상 */
+            background: linear-gradient(90deg, #64b3f4, #c2e59c); /* 버튼 그라데이션 배경색 */
+            border: none;
+            border-radius: 30px; /* 둥근 정도 추가 */
+            cursor: pointer; /* 커서 모양 변경 */
+            width: 250px;
+            height: 50px;
+        }
+        .retry-btn:hover {
+            background: linear-gradient(90deg, #33658d5b, #748b5c61); /* 마우스 오버 시 그라데이션 색상 변경 */
+        }
+        .footer {
+            margin-top: 240px; /* 하단 여백 */
+            font-size: 0.8em; /* 하단 글씨 크기 */
+        }
 
+        /* 모바일 화면 최적화를 위한 미디어 쿼리 */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 3em; /* 제목 크기 조정 */
+            }
+            .retry-btn {
+                width: 110px; /* 버튼 너비를 화면의 80%로 조정 */
+                height: 45px; /* 버튼 높이 조정 */
+                font-size: 1.2em; /* 버튼 텍스트 크기 조정 */
+            }
+            .message-container {
+                margin-left: 20px; /* 왼쪽 여백 조정 */
+                align-items: center; /* 중앙 정렬 */
+            }
+        }
     </style>
-  </head>
-  <body>
-    <main class="container">
-      <h1>Home Page</h1>
-        <h4>캡차 인증에 성공했습니다.</h4>
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <script>
-                alert("{{ messages[0] }}");  // 첫 번째 flash 메시지를 alert로 표시
-            </script>
-          {% endif %}
-        {% endwith %}
+</head>
+<body onload="fadeIn()">
+    
+      <div class="message-container">
+        <h1>환영합니다!</h1>
+        {% if messages %}
+          <script>
+              alert("{{ messages }}");  // 첫 번째 flash 메시지를 alert로 표시
+          </script>
+        {% endif %}
         <form action="/" method="get">
-            <button>Retry</button>
+            <button class="retry-btn">Retry</button>
         </form>
-    </main>
-  </body>
+      </div>
+
+  <script>
+    function fadeIn() {
+      document.body.style.opacity = 1; // 1초 후에 투명도를 1로 설정
+    }
+  </script>
+</body>
 </html>

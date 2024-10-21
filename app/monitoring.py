@@ -12,15 +12,15 @@ class PacketMonitor:
         self.attack_detected = False  # 공격 감지 여부
         self.last_attack_time = None  # 마지막 공격 감지 시간
         self.SMS_bool = False
-        self.total_threshold = 10000  # 총 패킷 수 임계값
-        self.average_threshold = 200  # 초당 평균 패킷 수 임계값
-        self.packet_count = 0  # 초기 패킷 수 설정
+        self.total_threshold = 100000 # 총 패킷 수 임계값
+        self.average_threshold = 1000 # 초당 평균 패킷 수 임계값
+        self.packet_count = 0         # 초기 패킷 수 설정
         self.lock = threading.Lock()  # 스레드 안전성을 위한 잠금 장치
 
     def monitor_packets(self):
         syn_flood1 = "(tcp.flags.syn == 1 && tcp.flags.ack == 0 && tcp.analysis.retransmission && tcp.dstport == 21)"
         syn_flood2 = "(ip.dst == 192.168.219.102 && tcp.dstport == 5050 && frame.len == 54 && tcp.window_size == 512)"
-        ping_of_death = "(icmp && icmp.type == 8)"
+        ping_of_death = "(icmp && icmp.type == 8 && data.len >= 10000)"
         udp_flood = "(udp && frame.len >= 100)"
 
         interface = self._get_connected_interface(psutil.net_if_stats())
@@ -38,6 +38,7 @@ class PacketMonitor:
 
         try:
             process = subprocess.Popen(tshark_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, universal_newlines=True, bufsize=1)
+
             unix_start_time = time.time()
             warnings_triggered = [False, False]
 
@@ -61,7 +62,7 @@ class PacketMonitor:
                     if udp_info and frame_length >= 100: attack_type = 'UDP Flooding'
                     self.packet_count += 1
 
-                    if 59 <= elapsed_time % 60 < 61 and data_length >= 10000 and icmp_type and self.packet_count > 15:
+                    if (59 <= elapsed_time % 60 < 61) and (data_length >= 10000) and (icmp_type and self.packet_count >= 15):
                         with self.lock:
                             self.attack_detected = True
                             self._trigger_attack(avg_packets_per_second, attack_type, ping_dl=data_length)
@@ -69,44 +70,56 @@ class PacketMonitor:
                             warnings_triggered = [False, False]
                             self.packet_count = 0
 
-                    if 179 <= elapsed_time % 181 < 181 and self.packet_count >= self.total_threshold and not warnings_triggered[0]:
+                    if (179 <= elapsed_time % 181 < 181) and (self.packet_count >= self.total_threshold) and (not warnings_triggered[0]):
                         with self.lock:
                             self._trigger_warning(3, 1, self.packet_count, avg_packets_per_second, attack_type)
                             warnings_triggered[0] = True
 
-                    elif 299 <= elapsed_time % 301 < 301 and avg_packets_per_second >= self.average_threshold and warnings_triggered[0] and not warnings_triggered[1]:
+                    elif (299 <= elapsed_time % 301 < 301) and (avg_packets_per_second >= self.average_threshold) and (warnings_triggered[0]) and (not warnings_triggered[1]):
                         with self.lock:
                             self._trigger_warning(5, 2, self.packet_count, avg_packets_per_second, attack_type)
                             warnings_triggered[1] = True
 
-                    elif 419 <= elapsed_time % 421 < 421 and avg_packets_per_second >= self.average_threshold and warnings_triggered[1]:
+                    elif (419 <= elapsed_time % 421 < 421) and (avg_packets_per_second >= self.average_threshold) and (warnings_triggered[1]):
                         with self.lock:
                             self.attack_detected = True
                             self._trigger_attack(avg_packets_per_second, attack_type)
                             unix_start_time = time.time()
                             warnings_triggered = [False, False]
                             self.packet_count = 0
+                    
                     elif elapsed_time >= 421:
-                        unix_start_time = time.time()
-                        warnings_triggered = [False, False]
-                        self.packet_count = 0
+                        with self.lock:
+                            packet_monitor.attack_detected = False
+                            unix_start_time = time.time()
+                            warnings_triggered = [False, False]
+                            self.packet_count = 0
+
         except Exception as e:
             print(f"오류 발생: {e}")
             sys.stdout.flush()
 
     def _trigger_warning(self, m, warning_level, packet_count, avg_packets_per_second, atck_type):
         """트래픽 상태에 따른 경고 처리"""
-        message = f"{warning_level}차 경고:\n{m}분동안 총 패킷 {packet_count}개 수신\n{avg_packets_per_second:.2f}pps\n공격유형: {atck_type}\n{datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')}"
+        message = (f"{warning_level}차 경고 : {atck_type} 공격 의심\n"
+                   f"{m}분간 총 수신 패킷 :  {packet_count}개\n"
+                   f"패킷 수신 속도 : {avg_packets_per_second:.2f}pps\n"
+                   f"{datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')}")
         print(message)
         self.show_notification(False, '서버 트래픽 알림', message)
 
     def _trigger_attack(self, avg_packets_per_second, atck_type, ping_dl=None):
         """공격 감지 처리"""
-        message = f"DDoS 공격 감지!\n{avg_packets_per_second:.2f}pps\n공격유형: {atck_type}\n{datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')}"
-        if ping_dl: message += f"\n데이터 크기 :{ping_dl}byte"
+        message = (
+	        f"{atck_type} 공격 감지\n"
+ 	        f"패킷 수신 속도 : {avg_packets_per_second:.2f}pps\n"
+        )
+        if ping_dl: message += f"데이터 크기 : {ping_dl}byte\n"
+        message += f"{datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')}"
+
         print(message)
         send_msg(message, atck_type)
-        self.show_notification(True, '서버 트래픽 알림', message)
+        self.show_notification(True, '서버 트래픽 알림 [DDoS]', message)
         self.last_attack_time = time.time()
 
     def show_notification(self, n,  title, message):
@@ -118,7 +131,7 @@ class PacketMonitor:
             title=title,
             message=message,
             app_name="트래픽 모니터링",
-            app_icon=f'assets/{icon}',
+            app_icon=f'static/assets/{icon}',
             timeout=15  # 초
         )
 
