@@ -1,4 +1,4 @@
-from flask import Flask, session
+from flask import Flask
 from app.routes import main_routes  # Flask 라우트 임포트
 from app.monitoring import packet_monitor  # PacketMonitor 임포트
 from dotenv import load_dotenv

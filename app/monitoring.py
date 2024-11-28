@@ -12,7 +12,7 @@ class PacketMonitor:
         self.attack_detected = False  # 공격 감지 여부
         self.last_attack_time = None  # 마지막 공격 감지 시간
         self.SMS_bool = False
-        self.total_threshold = 100000 # 총 패킷 수 임계값
+        self.total_threshold = 50000  # 총 패킷 수 임계값
         self.average_threshold = 1000 # 초당 평균 패킷 수 임계값
         self.packet_count = 0         # 초기 패킷 수 설정
         self.lock = threading.Lock()  # 스레드 안전성을 위한 잠금 장치
@@ -118,7 +118,7 @@ class PacketMonitor:
         message += f"{datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')}"
 
         print(message)
-        send_msg(message, atck_type)
+        send_msg(message)
         self.show_notification(True, '서버 트래픽 알림 [DDoS]', message)
         self.last_attack_time = time.time()
 

@@ -18,6 +18,8 @@ def recaptcha():
     # reCAPTCHA 인증 처리
     message = None
 
+    session.pop('authenticated', None)
+
     if request.method == 'POST':
         captcha_response = request.form['g-recaptcha-response']
         if verify_recaptcha(captcha_response):
@@ -28,7 +30,8 @@ def recaptcha():
             message = '캡차 인증 실패! 다시 시도해주세요.'
     if packet_monitor.attack_detected:
         with packet_monitor.lock:
-            message = 'DDoS공격이 감지되었습니다. 잠시 대기해주시기 바랍니다.'
+            remaining_time = 420 - (time.time() - packet_monitor.last_attack_time)
+            message = f'DDoS공격이 감지되었습니다! {(remaining_time // 60):.0f}분 {(remaining_time % 60):.0f}초 경과 후 재접속 바랍니다. (공격이 지속될 시 대기시간 연장)'
             
     return render_template('recaptcha.html', alert_message=message)
 
@@ -41,7 +44,8 @@ def main_page():
         return redirect(url_for('main.recaptcha'))
 
     if packet_monitor.is_attack_detected():
-        flash('DDoS 공격이 감지되었습니다! 잠시 대기해주시기 바랍니다.', 'danger')
+        remaining_time = 420 - (time.time() - packet_monitor.last_attack_time)
+        flash(f'DDoS 공격이 감지되었습니다! {(remaining_time // 60):.0f}분 {(remaining_time % 60):.0f}초 경과 후 재접속 바랍니다. (공격이 지속될 시 대기시간 연장)', 'danger')
         return redirect(url_for('main.recaptcha'))
 
     return render_template('index.html')
