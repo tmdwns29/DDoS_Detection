@@ -36,7 +36,7 @@
 
 ## 개발환경
   - ### 개발 언어 : Python
-  - ### IDE : VScode
+  - ### 텍스트 에디터 : VScode
   - ### 가상화 소프트웨어 : VM ware
   - ### 운영체제
     - 공격자 : Kali Linux
